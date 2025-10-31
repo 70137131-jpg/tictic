@@ -77,6 +77,15 @@ class EnhancedQlearner:
         self.rewards = []
         self.episode_count = 0
 
+
+class AgentUnpickler(pickle.Unpickler):
+    """Ensure legacy pickles looking for __main__ classes still load."""
+
+    def find_class(self, module, name):
+        if module == "__main__" and name in {"Learner", "Qlearner", "EnhancedQlearner"}:
+            return globals()[name]
+        return super().find_class(module, name)
+
 app = Flask(__name__, template_folder="templates")
 
 # Load agent (pickled Qlearner) lazily
@@ -97,7 +106,7 @@ def load_agent(path="q_agent.pkl"):
             print(f"Loading agent from {model_path}...")
             try:
                 with open(model_path, "rb") as f:
-                    _agent_cache = pickle.load(f)
+                    _agent_cache = AgentUnpickler(f).load()
                 _agent_load_time = file_mtime
                 print(f"Agent loaded successfully! Type: {type(_agent_cache).__name__}")
             except Exception as e:

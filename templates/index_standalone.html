@@ -38,6 +38,10 @@
     #board td:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #000; }
     #board td.X { background: #FF6B6B; }
     #board td.O { background: #4ECDC4; }
+    #board.frozen td {
+      pointer-events: none;
+      cursor: default;
+    }
     button {
       padding: 15px 30px;
       font-size: 18px;
@@ -57,6 +61,20 @@
       background: #FFF;
       box-shadow: 6px 6px 0 #000;
       font-weight: bold;
+    }
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 16px;
+      top: -10px;
+      z-index: 9999;
+      animation: confetti-fall linear forwards;
+    }
+    @keyframes confetti-fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
     }
   </style>
 </head>
@@ -80,6 +98,7 @@
     const status = document.getElementById('status');
     const resetBtn = document.getElementById('reset');
     let gameActive = true;
+    const confettiColors = ['#FF6B6B', '#4ECDC4', '#FFE951', '#95E1D3', '#F38181'];
 
     function readBoard() {
       const b = [];
@@ -114,11 +133,28 @@
       return null;
     }
 
+    function launchConfetti() {
+      const confettiCount = 120;
+      for (let i = 0; i < confettiCount; i++) {
+        setTimeout(() => {
+          const piece = document.createElement('div');
+          piece.className = 'confetti';
+          piece.style.left = Math.random() * 100 + '%';
+          piece.style.backgroundColor = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+          piece.style.animationDuration = (Math.random() * 2 + 3) + 's';
+          piece.style.opacity = Math.random();
+          piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+          document.body.appendChild(piece);
+          setTimeout(() => piece.remove(), 5000);
+        }, i * 20);
+      }
+    }
+
     async function handleMove(r, c) {
       if (!gameActive) return;
       const b = readBoard();
       if (b[r][c] !== '-') return;
-      
+
       b[r][c] = 'X';
       writeBoard(b);
       
@@ -148,15 +184,24 @@
 
     function endGame(winner) {
       gameActive = false;
-      if (winner === 'X') status.textContent = '🎉 You Win!';
-      else if (winner === 'O') status.textContent = '🤖 AI Wins!';
-      else status.textContent = "It's a Draw!";
+      board.classList.add('frozen');
+      if (winner === 'X') {
+        status.textContent = '🎉 You Win!';
+        launchConfetti();
+      } else if (winner === 'O') {
+        status.textContent = '🤖 AI Wins!';
+        launchConfetti();
+      } else {
+        status.textContent = "It's a Draw!";
+      }
     }
 
     function reset() {
       gameActive = true;
+      board.classList.remove('frozen');
       writeBoard([['-','-','-'],['-','-','-'],['-','-','-']]);
       status.textContent = 'Click a cell to start!';
+      document.querySelectorAll('.confetti').forEach(node => node.remove());
     }
 
     board.querySelectorAll('td').forEach(td => {

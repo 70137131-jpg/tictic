@@ -45,6 +45,15 @@ class EnhancedQlearner:
         self.rewards = []
         self.episode_count = 0
 
+
+class AgentUnpickler(pickle.Unpickler):
+    """Ensure legacy pickles referencing __main__ classes still load."""
+
+    def find_class(self, module, name):
+        if module == "__main__" and name in {"Learner", "Qlearner", "EnhancedQlearner"}:
+            return globals()[name]
+        return super().find_class(module, name)
+
 # Configure Flask app with proper paths for Vercel
 base_dir = os.path.dirname(os.path.dirname(__file__))
 template_dir = os.path.join(base_dir, 'templates')
@@ -76,7 +85,7 @@ def load_agent():
         if os.path.isfile(path):
             try:
                 with open(path, 'rb') as f:
-                    _agent_cache = pickle.load(f)
+                    _agent_cache = AgentUnpickler(f).load()
                 print(f"✅ Agent loaded from: {path}")
                 return _agent_cache
             except Exception as e:
