@@ -45,7 +45,14 @@ class EnhancedQlearner:
         self.rewards = []
         self.episode_count = 0
 
-app = Flask(__name__)
+# Configure Flask app with proper paths for Vercel
+base_dir = os.path.dirname(os.path.dirname(__file__))
+template_dir = os.path.join(base_dir, 'templates')
+static_dir = os.path.join(base_dir, 'static')
+
+app = Flask(__name__, 
+            template_folder=template_dir if os.path.exists(template_dir) else None,
+            static_folder=static_dir if os.path.exists(static_dir) else None)
 
 # --- Agent Loading ---
 _agent_cache = None
@@ -55,12 +62,14 @@ def load_agent():
     if _agent_cache is not None:
         return _agent_cache
     
-    # Try multiple paths for Vercel
+    # Try multiple paths for Vercel serverless environment
     possible_paths = [
-        'q_agent.pkl',
-        '../q_agent.pkl',
+        'q_agent.pkl',  # Current directory
+        '../q_agent.pkl',  # Parent directory
+        os.path.join(base_dir, 'q_agent.pkl'),  # Using calculated base_dir
         os.path.join(os.path.dirname(__file__), '..', 'q_agent.pkl'),
         os.path.join(os.path.dirname(os.path.dirname(__file__)), 'q_agent.pkl'),
+        os.path.join(os.path.dirname(__file__), 'q_agent.pkl'),  # In api folder (if moved)
     ]
     
     for path in possible_paths:
@@ -153,6 +162,12 @@ def _minimax_cached(flat_board, player):
         return best_score, best_mv
 
 # --- Routes ---
+@app.route("/static/<path:filename>")
+def static_files(filename):
+    """Serve static files"""
+    from flask import send_from_directory
+    return send_from_directory(app.static_folder or static_dir, filename)
+
 @app.route("/")
 def index():
     return """<!DOCTYPE html>
@@ -233,5 +248,6 @@ def api_evaluate():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Vercel handler
-app = app
+# Vercel handler - required export for serverless functions
+# Vercel's @vercel/python automatically detects Flask apps named 'app'
+# The app is already configured with proper template and static folders

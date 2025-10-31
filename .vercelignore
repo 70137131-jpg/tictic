@@ -7,8 +7,6 @@ venv/
 .git/
 .DS_Store
 node_modules/
-static/
-templates/
 visualize_training.py
 train*.py
 README.md
