@@ -87,12 +87,16 @@ def load_agent(path="q_agent.pkl"):
     global _agent_cache, _agent_load_time
 
     # Check if file has been modified since last load
-    if os.path.isfile(path):
-        file_mtime = os.path.getmtime(path)
+    # Resolve path relative to this file for serverless environments (e.g., Vercel)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = path if os.path.isabs(path) else os.path.join(base_dir, path)
+
+    if os.path.isfile(model_path):
+        file_mtime = os.path.getmtime(model_path)
         if _agent_load_time is None or file_mtime > _agent_load_time:
-            print(f"Loading agent from {path}...")
+            print(f"Loading agent from {model_path}...")
             try:
-                with open(path, "rb") as f:
+                with open(model_path, "rb") as f:
                     _agent_cache = pickle.load(f)
                 _agent_load_time = file_mtime
                 print(f"Agent loaded successfully! Type: {type(_agent_cache).__name__}")
@@ -102,7 +106,7 @@ def load_agent(path="q_agent.pkl"):
                 raise
 
     if _agent_cache is None:
-        raise FileNotFoundError(f"Agent not found or failed to load from {path}")
+        raise FileNotFoundError(f"Agent not found or failed to load from {model_path}")
 
     return _agent_cache
 
