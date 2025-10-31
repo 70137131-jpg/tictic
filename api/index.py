@@ -1,14 +1,13 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template_string
 import pickle, os, random
 from functools import lru_cache
 from typing import Tuple
 from abc import ABC, abstractmethod
 import collections
 import numpy as np
-
-# --- Agent Classes (required for unpickling) ---
 from collections import deque
 
+# --- Agent Classes (required for unpickling) ---
 class Learner(ABC):
     """Parent class for Q-learning and SARSA agents."""
     def __init__(self, alpha, gamma, eps, eps_decay=0.):
@@ -207,16 +206,60 @@ def best_move_minimax(board, key='X'):
     moves = _legal_moves(board)
     return mv if mv is not None else moves[0]
 
+# Read templates as strings since Vercel doesn't handle folders well
+def get_template(name):
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    template_path = os.path.join(base_dir, "templates", name)
+    try:
+        with open(template_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        # Fallback for Vercel - try relative path
+        try:
+            with open(os.path.join("templates", name), 'r', encoding='utf-8') as f:
+                return f.read()
+        except:
+            return None
+
 # --- Flask routes ---
 @app.route("/")
 def index():
-    return render_template("index.html")
+    # Try standalone template first (all CSS/JS inline)
+    template = get_template("index_standalone.html")
+    if template:
+        return template
+    
+    # Fallback to regular template
+    template = get_template("index.html")
+    if template:
+        template = template.replace("{{ url_for('static', filename='style.css') }}", "/static/style.css")
+        template = template.replace("{{ url_for('static', filename='script.js') }}", "/static/script.js")
+        return template
+    
+    # Last resort - inline everything
+    return """<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>TicTacToe AI</title>
+<style>body{font-family:Arial;background:#FFE951;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0}.container{background:#FFF;padding:40px;border:6px solid #000;box-shadow:12px 12px 0 #000;max-width:550px;text-align:center}#board{border-collapse:separate;border-spacing:8px;margin:30px auto}#board td{width:100px;height:100px;font-size:48px;font-weight:bold;border:5px solid #000;background:#FFF;cursor:pointer;text-align:center;box-shadow:4px 4px 0 #000}#board td.X{background:#FF6B6B}#board td.O{background:#4ECDC4}button{padding:15px 30px;font-size:18px;font-weight:bold;border:5px solid #000;background:#4ECDC4;cursor:pointer;margin:10px;box-shadow:6px 6px 0 #000}#status{margin-top:20px;padding:20px;font-size:18px;border:5px solid #000;background:#FFF;box-shadow:6px 6px 0 #000;font-weight:bold}</style>
+</head><body><div class="container"><h3>Tic-Tac-Toe AI</h3><p>You are <strong>X</strong>, AI is <strong>O</strong></p><table id="board"><tr><td data-pos="0,0">-</td><td data-pos="0,1">-</td><td data-pos="0,2">-</td></tr><tr><td data-pos="1,0">-</td><td data-pos="1,1">-</td><td data-pos="1,2">-</td></tr><tr><td data-pos="2,0">-</td><td data-pos="2,1">-</td><td data-pos="2,2">-</td></tr></table><button id="reset">Reset</button><div id="status">Click to start!</div></div>
+<script>const board=document.getElementById('board'),status=document.getElementById('status');let gameActive=true;function readBoard(){const b=[];document.querySelectorAll('#board tr').forEach(tr=>{const row=[];tr.querySelectorAll('td').forEach(td=>row.push(td.textContent.trim()));b.push(row)});return b}function writeBoard(b){document.querySelectorAll('#board td').forEach(td=>{const[r,c]=td.dataset.pos.split(',').map(Number);td.textContent=b[r][c];td.className=b[r][c]!=='-'?b[r][c]:''})}function checkWinner(b){const lines=[[[0,0],[0,1],[0,2]],[[1,0],[1,1],[1,2]],[[2,0],[2,1],[2,2]],[[0,0],[1,0],[2,0]],[[0,1],[1,1],[2,1]],[[0,2],[1,2],[2,2]],[[0,0],[1,1],[2,2]],[[0,2],[1,1],[2,0]]];for(const line of lines){const[a,b,c]=line;const v1=b[a[0]][a[1]],v2=b[b[0]][b[1]],v3=b[c[0]][c[1]];if(v1!=='-'&&v1===v2&&v2===v3)return v1}if(b.every(row=>row.every(cell=>cell!=='-')))return'Draw';return null}async function handleMove(r,c){if(!gameActive)return;const b=readBoard();if(b[r][c]!=='-')return;b[r][c]='X';writeBoard(b);let result=checkWinner(b);if(result){endGame(result);return}status.textContent='🤖 AI thinking...';try{const res=await fetch('/api/move',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b,difficulty:'hard'})});const data=await res.json();const[i,j]=data.move;b[i][j]='O';writeBoard(b);result=checkWinner(b);if(result){endGame(result)}else{status.textContent='AI placed O at ('+i+','+j+')'}}catch(e){status.textContent='❌ Error: '+e.message}}function endGame(w){gameActive=false;if(w==='X')status.textContent='🎉 You Win!';else if(w==='O')status.textContent='🤖 AI Wins!';else status.textContent="Draw!"}function reset(){gameActive=true;writeBoard([['-','-','-'],['-','-','-'],['-','-','-']]);status.textContent='Click to start!'}board.querySelectorAll('td').forEach(td=>{td.addEventListener('click',()=>{const[r,c]=td.dataset.pos.split(',').map(Number);handleMove(r,c)})});document.getElementById('reset').addEventListener('click',reset)</script>
+</body></html>"""
 
 @app.route("/dashboard")
 def dashboard():
-    """Training visualization dashboard"""
-    import time
-    return render_template("dashboard.html", timestamp=int(time.time()))
+    template = get_template("dashboard.html")
+    if template:
+        import time
+        template = template.replace("{{ timestamp }}", str(int(time.time())))
+        template = template.replace("{{ url_for('static', filename='", "/static/")
+        template = template.replace("') }}", "")
+        return template
+    else:
+        return """
+        <!DOCTYPE html>
+        <html><head><title>Error</title></head>
+        <body><h1>Template Error</h1><p>Could not load dashboard.html</p></body>
+        </html>
+        """, 500
 
 @app.route("/api/generate_visualizations", methods=["POST"])
 def api_generate_visualizations():
@@ -307,11 +350,9 @@ def api_evaluate():
             turn = 'O' if turn == 'X' else 'X'
     return jsonify({"wins": wins, "draws": draws, "losses": losses})
 
-# Vercel serverless function handler
-def handler(request):
-    """Vercel serverless handler"""
-    with app.request_context(request.environ):
-        return app.full_dispatch_request()
+# Vercel handler
+def handler(environ, start_response):
+    return app(environ, start_response)
 
 # Also export app for Vercel
 application = app

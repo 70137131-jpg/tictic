@@ -1,3 +1,6 @@
+/* Force load check */
+:root { --loaded: true; }
+
 /* Neo-Brutalist Style */
 * {
     box-sizing: border-box;
