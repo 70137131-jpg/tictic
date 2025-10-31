@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TicTacToe RL Agent - Q-Learning</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h3>Tic-Tac-Toe Q-Learning Agent</h3>
+    <p>Play against the trained reinforcement learning agent. You are <strong style="color: #ff5252;">X</strong>, the agent is <strong style="color: #448aff;">O</strong>.</p>
+
+    <div class="difficulty-selector">
+      <label>Difficulty:</label>
+      <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
+      <button class="difficulty-btn" data-difficulty="medium">Medium</button>
+      <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+    </div>
+
+    <table id="board">
+      <tr>
+        <td data-pos="0,0">-</td>
+        <td data-pos="0,1">-</td>
+        <td data-pos="0,2">-</td>
+      </tr>
+      <tr>
+        <td data-pos="1,0">-</td>
+        <td data-pos="1,1">-</td>
+        <td data-pos="1,2">-</td>
+      </tr>
+      <tr>
+        <td data-pos="2,0">-</td>
+        <td data-pos="2,1">-</td>
+        <td data-pos="2,2">-</td>
+      </tr>
+    </table>
+
+    <div class="controls">
+      <button id="reset">Reset Game</button>
+    </div>
+
+    <div id="status">Click a cell to place your X, then ask the agent to move!</div>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

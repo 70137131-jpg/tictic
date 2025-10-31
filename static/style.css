@@ -1,0 +1,237 @@
+/* Neo-Brutalist Style */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial Black', 'Arial Bold', Gadget, sans-serif;
+    background-color: #FFE951;
+    background-image:
+        repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,.03) 10px, rgba(0,0,0,.03) 20px);
+    color: #000;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.container {
+    background: #FFFFFF;
+    padding: 40px;
+    border: 6px solid #000;
+    box-shadow: 12px 12px 0 #000;
+    max-width: 550px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+}
+
+h3 {
+    color: #000;
+    font-size: 42px;
+    margin: 0 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    font-weight: 900;
+}
+
+p {
+    color: #000;
+    font-size: 16px;
+    margin-bottom: 30px;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+}
+
+.difficulty-selector {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.difficulty-selector label {
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-right: 5px;
+}
+
+.difficulty-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 900;
+    border: 4px solid #000;
+    background: #FFF;
+    color: #000;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 4px 4px 0 #000;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.difficulty-btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0 #000;
+}
+
+.difficulty-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 3px 3px 0 #000;
+}
+
+.difficulty-btn.active {
+    background: #95E1D3;
+    transform: translate(1px, 1px);
+    box-shadow: 3px 3px 0 #000;
+}
+
+#board {
+    border-collapse: separate;
+    border-spacing: 8px;
+    margin: 30px auto;
+    background: transparent;
+}
+
+#board td {
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 60px;
+    font-weight: 900;
+    border: 5px solid #000;
+    cursor: pointer;
+    background: #FFF;
+    color: #000;
+    transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 4px 4px 0 #000;
+    position: relative;
+}
+
+#board td:hover:not(.disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #000;
+}
+
+#board td:active:not(.disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
+}
+
+#board td.X {
+    background: #FF6B6B;
+    color: #000;
+}
+
+#board td.O {
+    background: #4ECDC4;
+    color: #000;
+}
+
+#board td.disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+#board td.winning-cell {
+    background: #FFE951 !important;
+    animation: pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.controls {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+button {
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 900;
+    cursor: pointer;
+    border: 5px solid #000;
+    text-transform: uppercase;
+    transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 6px 6px 0 #000;
+    font-family: 'Arial Black', sans-serif;
+    letter-spacing: -1px;
+}
+
+button:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 #000;
+}
+
+button:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 4px 4px 0 #000;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#agentMove {
+    background-color: #4ECDC4;
+    color: #000;
+}
+
+#reset {
+    background-color: #FF6B6B;
+    color: #000;
+}
+
+#status {
+    margin-top: 30px;
+    padding: 20px;
+    font-size: 18px;
+    min-height: 30px;
+    color: #000;
+    background-color: #FFF;
+    border: 5px solid #000;
+    box-shadow: 6px 6px 0 #000;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+}
+
+#status.winner {
+    background-color: #FFE951;
+    animation: statusPulse 0.6s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+/* Confetti styles */
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    z-index: 9999;
+    animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+    to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}

@@ -1,0 +1,51 @@
+=== STEP-BY-STEP INSTRUCTIONS ===
+
+1. Open Command Prompt (CMD) or PowerShell
+
+2. Navigate to the project directory:
+   cd "c:\Users\Ali Haider\Desktop\reinforecemtn"
+
+3. (Optional) Create and activate virtual environment:
+   python -m venv venv
+   venv\Scripts\activate
+
+4. Install requirements:
+   pip install flask numpy
+
+5. Make sure you have trained the model (run notebook cells first)
+   - Open Untitled2.ipynb
+   - Run the training cells
+   - Verify q_agent.pkl file exists
+
+6. Run the Flask app using ONE of these methods:
+
+   METHOD 1 - Using batch file:
+   start.bat
+
+   METHOD 2 - Direct Python command:
+   python app.py
+
+   METHOD 3 - Using Python with debugging:
+   python -m flask run --debug
+
+7. Open your browser and go to:
+   http://127.0.0.1:5000
+   OR
+   http://localhost:5000
+
+8. To stop the server:
+   Press CTRL+C in the terminal
+
+=== TROUBLESHOOTING ===
+
+If you see "black screen":
+- Check browser console (F12) for JavaScript errors
+- Check terminal for Python errors
+- Run: python test_setup.py
+
+If you see "Agent not found":
+- Train the model first in the notebook
+- Make sure q_agent.pkl exists in the folder
+
+If port 5000 is busy:
+- Edit app.py and change port=5000 to port=5001
