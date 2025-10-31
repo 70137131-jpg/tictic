@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result) {
                 endGame(result.winner, result.line);
             } else {
-                statusElement.textContent = `Agent moved to (${i}, ${j}) ✨ Your turn!`;
+                statusElement.textContent = `Agent placed O at (${i}, ${j}). Your turn!`;
                 agentThinking = false;
             }
         } catch (err) {

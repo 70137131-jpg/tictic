@@ -103,15 +103,16 @@ p {
     height: 100px;
     text-align: center;
     vertical-align: middle;
-    font-size: 60px;
+    font-size: 48px;
     font-weight: 900;
     border: 5px solid #000;
     cursor: pointer;
     background: #FFF;
     color: #000;
-    transition: transform 0.1s, box-shadow 0.1s;
+    transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
     box-shadow: 4px 4px 0 #000;
     position: relative;
+    line-height: 100px;
 }
 
 #board td:hover:not(.disabled) {
