@@ -81,6 +81,10 @@ app = Flask(__name__,
             template_folder=os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates"),
             static_folder=os.path.join(os.path.dirname(os.path.dirname(__file__)), "static"))
 
+# Add explicit static_url_path for Vercel
+app.static_url_path = '/static'
+app.static_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+
 # Load agent (pickled Qlearner) lazily
 _agent_cache = None
 _agent_load_time = None
@@ -304,4 +308,10 @@ def api_evaluate():
     return jsonify({"wins": wins, "draws": draws, "losses": losses})
 
 # Vercel serverless function handler
-app = app
+def handler(request):
+    """Vercel serverless handler"""
+    with app.request_context(request.environ):
+        return app.full_dispatch_request()
+
+# Also export app for Vercel
+application = app
