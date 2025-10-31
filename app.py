@@ -129,6 +129,12 @@ def _winner(board):
     return 'D'
 
 def _agent_greedy_move(agent, board) -> Tuple[int,int]:
+    # Check if agent is DQN (has get_action method)
+    if hasattr(agent, 'get_action'):
+        # DQN agent
+        return agent.get_action(board, greedy=True)
+
+    # Tabular Q-learning agent
     state = getStateKey(board)
     possible = _legal_moves(board)
 
@@ -195,6 +201,22 @@ def best_move_minimax(board, key='X'):
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route("/dashboard")
+def dashboard():
+    """Training visualization dashboard"""
+    import time
+    return render_template("dashboard.html", timestamp=int(time.time()))
+
+@app.route("/api/generate_visualizations", methods=["POST"])
+def api_generate_visualizations():
+    """Generate training visualizations on demand"""
+    try:
+        from visualize_training import generate_all_visualizations
+        generate_all_visualizations('q_agent.pkl')
+        return jsonify({"status": "success", "message": "Visualizations generated"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/api/move", methods=["POST"])
 def api_move():

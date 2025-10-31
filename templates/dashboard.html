@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Training Dashboard - Q-Learning Agent</title>
+  <style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Arial Black', 'Arial Bold', Gadget, sans-serif;
+        background-color: #FFE951;
+        background-image:
+            repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,.03) 10px, rgba(0,0,0,.03) 20px);
+        color: #000;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: #FFFFFF;
+        padding: 40px;
+        border: 6px solid #000;
+        box-shadow: 12px 12px 0 #000;
+    }
+
+    h1 {
+        color: #000;
+        font-size: 48px;
+        margin: 0 0 10px 0;
+        text-transform: uppercase;
+        letter-spacing: -2px;
+        font-weight: 900;
+        text-align: center;
+    }
+
+    .subtitle {
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 30px;
+    }
+
+    .nav-links {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .nav-links a {
+        display: inline-block;
+        padding: 15px 30px;
+        margin: 0 10px;
+        font-size: 16px;
+        font-weight: 900;
+        text-decoration: none;
+        color: #000;
+        background: #4ECDC4;
+        border: 5px solid #000;
+        box-shadow: 6px 6px 0 #000;
+        text-transform: uppercase;
+        transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .nav-links a:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 8px 8px 0 #000;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
+        margin-top: 30px;
+    }
+
+    .viz-card {
+        background: #FFF;
+        border: 5px solid #000;
+        box-shadow: 6px 6px 0 #000;
+        padding: 20px;
+    }
+
+    .viz-card h2 {
+        font-size: 28px;
+        font-weight: 900;
+        text-transform: uppercase;
+        margin: 0 0 20px 0;
+        letter-spacing: -1px;
+    }
+
+    .viz-card img {
+        width: 100%;
+        height: auto;
+        border: 3px solid #000;
+    }
+
+    .refresh-btn {
+        display: block;
+        margin: 30px auto;
+        padding: 20px 40px;
+        font-size: 20px;
+        font-weight: 900;
+        cursor: pointer;
+        border: 5px solid #000;
+        background: #FF6B6B;
+        color: #000;
+        text-transform: uppercase;
+        box-shadow: 6px 6px 0 #000;
+        transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .refresh-btn:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 8px 8px 0 #000;
+    }
+
+    .refresh-btn:active {
+        transform: translate(2px, 2px);
+        box-shadow: 4px 4px 0 #000;
+    }
+
+    .loading {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 900;
+        margin: 40px 0;
+        display: none;
+    }
+
+    .error {
+        color: #FF0000;
+        font-weight: bold;
+        text-align: center;
+        margin: 20px 0;
+        display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Training Dashboard</h1>
+    <p class="subtitle">Visualize and understand your Q-Learning agent's behavior</p>
+
+    <div class="nav-links">
+      <a href="/">← Back to Game</a>
+      <button class="refresh-btn" onclick="regenerateVisualizations()">🔄 Regenerate Visualizations</button>
+    </div>
+
+    <div class="loading" id="loading">⏳ Generating visualizations... Please wait...</div>
+    <div class="error" id="error"></div>
+
+    <div class="dashboard-grid">
+      <div class="viz-card">
+        <h2>📈 Training Performance Curves</h2>
+        <p>Track reward progress, win/draw/loss rates, and epsilon decay over training episodes.</p>
+        <img src="{{ url_for('static', filename='training_curves.png') }}?v={{ timestamp }}"
+             alt="Training Curves" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22600%22%3E%3Crect width=%22800%22 height=%22600%22 fill=%22%23f0f0f0%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2224%22%3EVisualization not yet generated%3C/text%3E%3C/svg%3E'">
+      </div>
+
+      <div class="viz-card">
+        <h2>🎯 Q-Value Heatmaps</h2>
+        <p>Visualize learned Q-values for key board states. Brighter green = higher value (better move).</p>
+        <img src="{{ url_for('static', filename='q_value_heatmap.png') }}?v={{ timestamp }}"
+             alt="Q-Value Heatmap" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22600%22%3E%3Crect width=%22800%22 height=%22600%22 fill=%22%23f0f0f0%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2224%22%3EVisualization not yet generated%3C/text%3E%3C/svg%3E'">
+      </div>
+
+      <div class="viz-card">
+        <h2>📊 State Space Statistics</h2>
+        <p>Explore state space coverage, Q-value distributions, and agent statistics.</p>
+        <img src="{{ url_for('static', filename='state_space_stats.png') }}?v={{ timestamp }}"
+             alt="State Space Stats" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22600%22%3E%3Crect width=%22800%22 height=%22600%22 fill=%22%23f0f0f0%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2224%22%3EVisualization not yet generated%3C/text%3E%3C/svg%3E'">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function regenerateVisualizations() {
+      const loading = document.getElementById('loading');
+      const error = document.getElementById('error');
+      const btn = event.target;
+
+      loading.style.display = 'block';
+      error.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = '⏳ Generating...';
+
+      try {
+        const response = await fetch('/api/generate_visualizations', {
+          method: 'POST'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to generate visualizations');
+        }
+
+        // Reload images with new timestamp to bypass cache
+        const timestamp = Date.now();
+        document.querySelectorAll('.viz-card img').forEach(img => {
+          const src = img.src.split('?')[0];
+          img.src = src + '?v=' + timestamp;
+        });
+
+        loading.style.display = 'none';
+        btn.disabled = false;
+        btn.textContent = '✅ Regenerated!';
+        setTimeout(() => {
+          btn.textContent = '🔄 Regenerate Visualizations';
+        }, 2000);
+      } catch (err) {
+        console.error(err);
+        loading.style.display = 'none';
+        error.textContent = '❌ Failed to generate visualizations: ' + err.message;
+        error.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = '🔄 Regenerate Visualizations';
+      }
+    }
+  </script>
+</body>
+</html>

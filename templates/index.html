@@ -38,9 +38,20 @@
 
     <div class="controls">
       <button id="reset">Reset Game</button>
+      <a href="/dashboard" style="display: inline-block; padding: 15px 30px; font-size: 18px; font-weight: 900; cursor: pointer; border: 5px solid #000; background-color: #95E1D3; color: #000; text-transform: uppercase; box-shadow: 6px 6px 0 #000; text-decoration: none; transition: transform 0.1s, box-shadow 0.1s;" onmouseover="this.style.transform='translate(-2px, -2px)'; this.style.boxShadow='8px 8px 0 #000'" onmouseout="this.style.transform=''; this.style.boxShadow='6px 6px 0 #000'">📊 View Dashboard</a>
     </div>
 
     <div id="status">Click a cell to place your X, then ask the agent to move!</div>
+
+    <div class="move-history">
+      <h4>Move History</h4>
+      <ul id="move-history-list"></ul>
+      <div class="replay-controls">
+        <button id="replay-prev">⏮ Previous</button>
+        <button id="replay-next">⏭ Next</button>
+        <button id="replay-exit">🚪 Exit Replay</button>
+      </div>
+    </div>
   </div>
 
   <script src="{{ url_for('static', filename='script.js') }}"></script>
