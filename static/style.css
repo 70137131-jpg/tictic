@@ -315,3 +315,157 @@ button:disabled {
 #replay-exit {
     background: #FF6B6B !important;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 20px;
+        border: 4px solid #000;
+        box-shadow: 6px 6px 0 #000;
+    }
+
+    h3 {
+        font-size: 28px;
+        letter-spacing: -1px;
+    }
+
+    p {
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .difficulty-selector {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .difficulty-btn {
+        padding: 8px 16px;
+        font-size: 12px;
+        border: 3px solid #000;
+        box-shadow: 3px 3px 0 #000;
+    }
+
+    #board {
+        border-spacing: 5px;
+        margin: 20px auto;
+    }
+
+    #board td {
+        width: 70px;
+        height: 70px;
+        font-size: 40px;
+        border: 4px solid #000;
+        box-shadow: 3px 3px 0 #000;
+    }
+
+    #board td:hover:not(.disabled) {
+        box-shadow: 4px 4px 0 #000;
+    }
+
+    button {
+        padding: 12px 20px;
+        font-size: 14px;
+        border: 4px solid #000;
+        box-shadow: 4px 4px 0 #000;
+    }
+
+    button:hover:not(:disabled) {
+        box-shadow: 5px 5px 0 #000;
+    }
+
+    #status {
+        padding: 15px;
+        font-size: 14px;
+        border: 4px solid #000;
+        box-shadow: 4px 4px 0 #000;
+    }
+
+    .move-history {
+        padding: 15px;
+        border: 4px solid #000;
+        box-shadow: 4px 4px 0 #000;
+    }
+
+    .move-history h4 {
+        font-size: 18px;
+    }
+
+    .history-item {
+        font-size: 12px;
+        padding: 8px 12px;
+        border: 2px solid #000;
+    }
+
+    .replay-controls button {
+        padding: 8px 15px;
+        font-size: 12px;
+        border: 3px solid #000;
+        box-shadow: 3px 3px 0 #000;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 15px;
+        border: 3px solid #000;
+        box-shadow: 4px 4px 0 #000;
+    }
+
+    h3 {
+        font-size: 22px;
+    }
+
+    p {
+        font-size: 12px;
+    }
+
+    .difficulty-selector {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .difficulty-selector label {
+        font-size: 14px;
+    }
+
+    .difficulty-btn {
+        width: 100%;
+        padding: 10px;
+    }
+
+    #board {
+        border-spacing: 4px;
+    }
+
+    #board td {
+        width: 60px;
+        height: 60px;
+        font-size: 32px;
+        border: 3px solid #000;
+    }
+
+    .controls {
+        gap: 10px;
+    }
+
+    button {
+        padding: 10px 15px;
+        font-size: 12px;
+        border: 3px solid #000;
+        box-shadow: 3px 3px 0 #000;
+    }
+
+    #status {
+        font-size: 12px;
+        padding: 12px;
+    }
+
+    #move-history-list {
+        max-height: 150px;
+    }
+}
